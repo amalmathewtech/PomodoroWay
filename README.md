@@ -5,7 +5,7 @@ This app is inpired by [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodo
 
 Watch Video on Youtube:https://youtu.be/EFCHjli4VeM
 
-Download apk : https://drive.google.com/open?id=1vs6P0ZWmf6zmkR8J-mmwGKJMiUrCqgkx
+Download apk(v1.0): https://github.com/amalmathewtech/PomodoroWay/releases/download/v1.0/pomodoroway__v01.apk
 
 
 
