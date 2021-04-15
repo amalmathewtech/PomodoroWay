@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy
+requirements = python3,kivy==2.0.0,kivymd==0.104.0,pygments,sdl2_ttf==2.0.15,pillow
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -90,7 +90,7 @@ android.presplash_color = #0079a0
 #android.permissions = INTERNET
 
 # (int) Target Android API, should be as high as possible.
-#android.api = 27
+android.api = 29
 
 # (int) Minimum API your APK will support.
 #android.minapi = 21
@@ -215,7 +215,7 @@ android.presplash_color = #0079a0
 #android.uses_library =
 
 # (str) Android logcat filters to use
-#android.logcat_filters = *:S python:D
+android.logcat_filters = *:S python:D
 
 # (bool) Copy library instead of making a libpymodules.so
 #android.copy_libs = 1

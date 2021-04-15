@@ -1,71 +1,161 @@
-from kivy.app import App 
-from kivy.lang import Builder 
-from kivy.uix.screenmanager import Screen 
-from kivy.uix.button import ButtonBehavior
-from kivy.uix.image import Image
-from kivy.clock import Clock 
+from kivymd.app import MDApp
+from kivy.uix.floatlayout import FloatLayout
+from kivymd.uix.tab import MDTabsBase
+
+
+from kivy.lang import Builder
+from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 
-class FirstScreen(Screen):
-    pass
 
-class ImageButton(ButtonBehavior, Image):
-    pass
-
-class SecondScreen(Screen):
-    pomodoro_time = 1500
-    def on_enter(self):
-        print("screen 2")
-        Clock.schedule_interval(self.update_pomodoro_timer,1)
-        
+KV = '''
+BoxLayout:
+    orientation: "vertical"
+    MDToolbar:
+        id: toolbar
+        title: "PomodoroWay"
+        md_bg_color:(0.858,0.32,0.30,1)
+        bold: True
     
-    def update_pomodoro_timer(self,*args):
+    MDTabs:
+        id: tabs
+        background_color:(0.898,0.37,0.34,1)
+         
+        BoxLayout:
+            
+            orientation: 'vertical'
+            col:(0.898,0.37,0.34,1)
+            id : clr
+            canvas:
+                Color:
+                    rgb:self.col
+                Rectangle:
+                    pos:self.pos
+                    size:self.size
+            
+            FloatLayout:
+
+                MDLabel:
+                    id : time
+                    text: '[color=#ffffff][b]25[/b]:[b]00[/b][/color]'
+                    markup: True
+                    halign: 'center'
+                    valign: 'middle'
+                    font_name: 'Roboto'
+                    font_size: 160
+            
+                MDRectangleFlatButton:
+                    id: start_btn
+                    text: "[color=#fc382d][b]START[/b][/color]"
+                    bold:True
+                    md_bg_color:1,1,1,1
+                    markup:True
+                    pos_hint: {'center_x':0.5, 'center_y':0.3}
+                    size_hint: (0.40,0.10)
+                    on_press: app.start_timer()
+
+                MDLabel:
+                    id : info
+                    text: ''
+                    color: 1,1,1,1
+                    bold:True
+                    halign: 'center'
+                    pos_hint: {'center_x':0.5, 'center_y':0.2}
+                
+                MDLabel:
+                    id: mode
+                    text: 'Pomodoro'
+                    markup:True
+                    color: 1,1,1,1
+                    bold:True
+                    halign: 'center'
+                    pos_hint: {'center_x':0.5, 'center_y':0.8}
+                  
+'''
+
+class PomodoroWayApp(MDApp):
+    pomodoro_time = 1500
+    mode = 1
+    cycles = 0
+
+    def update_time(self,sec):
         self.pomodoro_time -= 1
-        self.p_minutes = self.pomodoro_time // 60 
-        self.p_seconds = self.pomodoro_time % 60 
-        self.ids.timer1.text =("{} : {} ".format(self.p_minutes,self.p_seconds))
-        if self.pomodoro_time == 0 :
-            sound = SoundLoader.load('timer.ogg')
-            if sound:
-                sound.play()
-            self.ids.timer1.text = "25:00"
-            self.pomodoro_time = 1500
-            Clock.unschedule(self.update_pomodoro_timer)
-            self.manager.current = 'third_screen'
+        p_minutes, p_seconds = self.pomodoro_time // 60, self.pomodoro_time % 60
+    
+        self.root.ids.time.text = ('[color=#ffffff][b]%02d[/b]:[b]%02d[/b][/color]' % (p_minutes, p_seconds))
 
-
-class ThirdScreen(Screen):
-    break_time = 300
-    def on_enter(self):
-        print("screen 3 ")
-        Clock.schedule_interval(self.update_break_timer,1)
-
-    def update_break_timer(self,*args):
-        self.break_time -= 1
-        self.b_minutes = self.break_time // 60 
-        self.b_seconds = self.break_time % 60 
-        self.ids.timer2.text =("{} : {} ".format(self.b_minutes,self.b_seconds))
-
-        if self.break_time == 0:
-             self.ids.timer2.text ="5:00"
-             self.break_time = 300
-             Clock.unschedule(self.update_break_timer)
-             self.manager.current = 'second_screen'
-        if self.break_time == 6:
+        if self.mode == 1 and self.pomodoro_time == 0:
+            self.mode = 2
+            self.root.ids.time.text = '[color=#ffffff][b]05[/b]:[b]00[/b][/color]'
+            self.pomodoro_time = 300
             sound = SoundLoader.load('timer.ogg')
             if sound:
                 sound.play()
 
-GUI = Builder.load_file("main.kv")
+        if self.mode == 2 and self.pomodoro_time == 0:
+            self.cycles = self.cycles+1
+            if self.cycles == 4:
+                self.mode = 3
+                self.root.ids.time.text = '[color=#ffffff][b]20[/b]:[b]00[/b][/color]'
+                self.pomodoro_time = 1200
+                sound = SoundLoader.load('timer.ogg')
+                if sound:
+                    sound.play()
+            else:
+                self.mode = 1
+                self.root.ids.time.text = '[color=#ffffff][b]25[/b]:[b]00[/b][/color]'
+                self.pomodoro_time = 1500
+                sound = SoundLoader.load('timer.ogg')
+                if sound:
+                    sound.play()
+        
+        if self.mode == 3 and self.pomodoro_time == 0:
+            self.restart()
+            sound = SoundLoader.load('timer.ogg')
+            if sound:
+                sound.play()
 
-class MainApp(App):
+        if self.mode == 1:
+            self.root.ids.info.text = 'Time to work!'
+            self.root.ids.mode.text = 'Pomodoro'
+            self.root.ids.tabs.background_color = (0.898,0.37,0.34,1)
+            self.root.ids.toolbar.md_bg_color = (0.858,0.32,0.30,1)
+            self.root.ids.clr.col =(0.898,0.37,0.34,1)
+
+        if self.mode == 2:
+            self.root.ids.info.text = 'Time for a break'
+            self.root.ids.mode.text = 'Short Break'
+            self.root.ids.tabs.background_color = (0.274, 0.55, 0.568, 1)
+            self.root.ids.toolbar.md_bg_color = (0.304, 0.58, 0.598, 1)
+            self.root.ids.clr.col = (0.274, 0.55, 0.568, 1)
+            self.root.ids.start_btn.disabled = True
+            self.root.ids.start_btn.opacity = 0
+
+        if self.mode == 3:
+            self.root.ids.info.text = 'Time for a break'
+            self.root.ids.mode.text = 'Long Break'
+            self.root.ids.tabs.background_color = (0.2627, 0.494, 0.65, 1)
+            self.root.ids.toolbar.md_bg_color = (0.2927, 0.524, 0.68, 1)
+            self.root.ids.clr.col = (0.2627, 0.494, 0.65, 1)
+            self.root.ids.start_btn.disabled = True
+            self.root.ids.start_btn.opacity = 0
+
+    def restart(self):
+        Clock.unschedule(self.update_time)
+        self.root.ids.start_btn.opacity = 1
+        self.root.ids.start_btn.disabled = False
+        self.cycles = 0
+        self.mode = 1
+        self.root.ids.time.text = '[color=#ffffff][b]25[/b]:[b]00[/b][/color]'
+        self.pomodoro_time = 1500
+
+
+    def start_timer(self):
+        self.root.ids.start_btn.opacity = 0
+        self.root.ids.start_btn.disabled = True
+        Clock.schedule_interval(self.update_time, 1)
+
     def build(self):
-        return GUI
+        return Builder.load_string(KV)
 
-    def change_screen(self, screen_name):
-        #Get the screen manager from the kv file 
-        screen_manager =self.root.ids['screen_manager']
-        screen_manager.current = screen_name
-
-MainApp().run()
-
+PomodoroWayApp().run()
