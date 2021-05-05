@@ -34,7 +34,6 @@ BoxLayout:
                     size:self.size
             
             FloatLayout:
-
                 MDLabel:
                     id : time
                     text: '[color=#ffffff][b]25[/b]:[b]00[/b][/color]'
@@ -53,7 +52,6 @@ BoxLayout:
                     pos_hint: {'center_x':0.5, 'center_y':0.3}
                     size_hint: (0.40,0.10)
                     on_press: app.start_timer()
-
                 MDLabel:
                     id : info
                     text: ''
@@ -85,16 +83,7 @@ class PomodoroWayApp(MDApp):
         self.root.ids.time.text = ('[color=#ffffff][b]%02d[/b]:[b]%02d[/b][/color]' % (p_minutes, p_seconds))
 
         if self.mode == 1 and self.pomodoro_time == 0:
-            self.mode = 2
-            self.root.ids.time.text = '[color=#ffffff][b]05[/b]:[b]00[/b][/color]'
-            self.pomodoro_time = 300
-            sound = SoundLoader.load('timer.ogg')
-            if sound:
-                sound.play()
-
-        if self.mode == 2 and self.pomodoro_time == 0:
-            self.cycles = self.cycles+1
-            if self.cycles == 4:
+            if self.cycles == 3:
                 self.mode = 3
                 self.root.ids.time.text = '[color=#ffffff][b]20[/b]:[b]00[/b][/color]'
                 self.pomodoro_time = 1200
@@ -102,12 +91,21 @@ class PomodoroWayApp(MDApp):
                 if sound:
                     sound.play()
             else:
-                self.mode = 1
-                self.root.ids.time.text = '[color=#ffffff][b]25[/b]:[b]00[/b][/color]'
-                self.pomodoro_time = 1500
+                self.mode = 2
+                self.root.ids.time.text = '[color=#ffffff][b]05[/b]:[b]00[/b][/color]'
+                self.pomodoro_time = 300
                 sound = SoundLoader.load('timer.ogg')
                 if sound:
                     sound.play()
+
+        if self.mode == 2 and self.pomodoro_time == 0:
+            self.cycles = self.cycles+1
+            self.mode = 1
+            self.root.ids.time.text = '[color=#ffffff][b]25[/b]:[b]00[/b][/color]'
+            self.pomodoro_time = 1500
+            sound = SoundLoader.load('timer.ogg')
+            if sound:
+                sound.play()
         
         if self.mode == 3 and self.pomodoro_time == 0:
             self.restart()
